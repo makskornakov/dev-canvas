@@ -40,7 +40,7 @@ export default function PlanetCanvas() {
   }, [canvasSize]);
 
   const planetController = useMemo(
-    () => new BodyController(5), //  canvasSize?.width ?? 0, canvasSize?.height ?? 0
+    () => new BodyController(2), //  canvasSize?.width ?? 0, canvasSize?.height ?? 0
     [],
   );
 

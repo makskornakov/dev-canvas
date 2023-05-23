@@ -21,11 +21,14 @@ export class BodyController {
 
     // Initialize the planets
     for (let i = 0; i < this.numPlanets; i++) {
-      let mass = p5.random(5, 15);
-      let spawnRadius = p5.random(
-        this.sun.diameter,
-        p5.min(p5.windowWidth / 2, p5.windowHeight / 2),
-      );
+      let mass = p5.random(1, 10);
+      let spawnRadius =
+        i === 0
+          ? p5.random(this.sun.diameter, p5.min(p5.windowWidth / 6, p5.windowHeight / 6))
+          : p5.random(
+              p5.min(p5.windowWidth / 4, p5.windowHeight / 4),
+              p5.min(p5.windowWidth, p5.windowHeight),
+            );
       let angle = p5.random(0, p5.TWO_PI);
       let planetPos = p5.createVector(spawnRadius * p5.cos(angle), spawnRadius * p5.sin(angle));
 
