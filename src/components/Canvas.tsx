@@ -179,13 +179,13 @@ export default function Canvas() {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
     balls.forEach((ball) => {
-      const velocityMagnitude = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-      const squeezeFactor = Math.pow(1 / velocityMagnitude, 0.1);
-      const rotationAngle = Math.atan2(ball.vx, ball.vy);
+      // const velocityMagnitude = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+      // const squeezeFactor = Math.pow(1 / velocityMagnitude, 0.1);
+      // const rotationAngle = Math.atan2(ball.vx, ball.vy);
 
       // Apply the squeeze factor to the ball's dimensions
-      const squeezedWidth = ball.radius * squeezeFactor;
-      const squeezedHeight = ball.radius / squeezeFactor;
+      // const squeezedWidth = ball.radius * squeezeFactor;
+      // const squeezedHeight = ball.radius / squeezeFactor;
 
       // Draw the squeezed ball
       context.beginPath();
@@ -407,10 +407,10 @@ function handleCollisions(balls: Ball[]): void {
         const sin = Math.sin(angle);
         const cos = Math.cos(angle);
 
-        const x1 = 0;
-        const y1 = 0;
-        const x2 = dx * cos + dy * sin;
-        const y2 = dy * cos - dx * sin;
+        // const x1 = 0;
+        // const y1 = 0;
+        // const x2 = dx * cos + dy * sin;
+        // const y2 = dy * cos - dx * sin;
 
         // Rotate the velocities
         const vx1 = ballA.vx * cos + ballA.vy * sin;
