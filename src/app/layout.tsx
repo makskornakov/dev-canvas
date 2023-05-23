@@ -1,6 +1,8 @@
+import type { Metadata } from 'next';
+
 import StyledComponentsRegistry from '../lib/registry';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Dutch Houses',
   description: 'Generator of Dutch houses',
 };
