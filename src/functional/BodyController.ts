@@ -7,6 +7,10 @@ export class BodyController {
   planets: Body[] = [];
   sun!: Body;
   readonly destabilize = 0.15;
+  features = {
+    /** When this is false, only Sun attracts other planets. */
+    attractEachOther: true,
+  };
 
   constructor(readonly numPlanets = 4) {
     this.setup();
@@ -40,6 +44,15 @@ export class BodyController {
   simulate() {
     for (let i = this.planets.length - 1; i >= 0; i--) {
       this.sun.attract(this.planets[i]);
+
+      if (this.features.attractEachOther) {
+        // all other planets attract each other
+        for (let j = this.planets.length - 1; j >= 0; j--) {
+          if (j === i) continue;
+          this.planets[i].attract(this.planets[j]);
+        }
+      }
+
       this.planets[i].move();
     }
   }
