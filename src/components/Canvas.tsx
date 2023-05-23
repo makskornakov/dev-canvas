@@ -7,7 +7,7 @@ interface Ball {
   y: number;
   vx: number;
   vy: number;
-  // speed: number;
+  speed: number;
   radius: number;
   color: string;
 }
@@ -56,7 +56,7 @@ export default function Canvas() {
     if (!canvasSize) return;
     // set 10 balls with random x, y, vx, vy, radius = 50
     const NBalls = 20;
-    const radius = 25;
+    const radius = 80;
     const radiusVariation = 0.3;
     const { width, height } = canvasSize;
     // const newBalls = Array.from({ length: NBalls }, () => ({
@@ -83,7 +83,7 @@ export default function Canvas() {
       y: height / 2,
       vx: 0,
       vy: 0,
-      // speed: 0,
+      speed: 0,
       radius: 200,
       color: '#fff',
     });
@@ -95,8 +95,12 @@ export default function Canvas() {
       const ball = {
         x: Math.random() * (width - finalRadius * 2) + finalRadius,
         y: Math.random() * (height - finalRadius * 2) + finalRadius,
-        vx: 0,
-        vy: 0,
+        // random from -1 to 1
+        vx: Math.random() * 2 - 1,
+        vy: Math.random() * 2 - 1,
+
+        // random from 0.01 to 0.05
+        speed: Math.random() * 0.04 + 0.01,
         radius: finalRadius,
         color: `red`,
         // color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
@@ -121,8 +125,28 @@ export default function Canvas() {
 
   function simulation(balls: Ball[], width: number, height: number) {
     balls.forEach((ballA) => {
-      ballA.x += ballA.vx;
-      ballA.y += ballA.vy;
+      // ballA.x += ballA.vx;
+      // ballA.y += ballA.vy;
+
+      // if (ballA.x + ballA.radius > width) {
+      //   ballA.x = width - ballA.radius;
+      //   ballA.vx *= -1;
+      // } else if (ballA.x - ballA.radius < 0) {
+      //   ballA.x = ballA.radius;
+      //   ballA.vx *= -1;
+      // }
+
+      // if (ballA.y + ballA.radius > height) {
+      //   ballA.y = height - ballA.radius;
+      //   ballA.vy *= -1;
+      // } else if (ballA.y - ballA.radius < 0) {
+      //   ballA.y = ballA.radius;
+      //   ballA.vy *= -1;
+      // }
+
+      // same but now vx, vy are in range -1 -- 1 and there is a speed property
+      ballA.x += ballA.vx * ballA.speed;
+      ballA.y += ballA.vy * ballA.speed;
 
       if (ballA.x + ballA.radius > width) {
         ballA.x = width - ballA.radius;
@@ -140,7 +164,7 @@ export default function Canvas() {
         ballA.vy *= -1;
       }
     });
-    updateBalls(balls, 0.02);
+    handleCollisions(balls);
     return balls;
   }
 
@@ -165,15 +189,16 @@ export default function Canvas() {
 
       // Draw the squeezed ball
       context.beginPath();
-      context.ellipse(
-        ball.x,
-        ball.y,
-        Math.min(squeezedWidth, ball.radius * 2),
-        Math.max(squeezedHeight, ball.radius / 2),
-        -rotationAngle,
-        0,
-        2 * Math.PI,
-      );
+      // context.ellipse(
+      //   ball.x,
+      //   ball.y,
+      //   Math.min(squeezedWidth, ball.radius * 2),
+      //   Math.max(squeezedHeight, ball.radius / 2),
+      //   -rotationAngle,
+      //   0,
+      //   2 * Math.PI,
+      // );
+      context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
       context.fillStyle = ball.color;
       context.fill();
       context.closePath();
@@ -282,7 +307,14 @@ export default function Canvas() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <span>
-        {stats.ups} ups, {stats.fps} fps
+        <input
+          type="number"
+          onBlur={(event) => {
+            setSimulationSpeed(1000 / Number(event.target.value));
+          }}
+          defaultValue={stats.ups}
+        />
+        ups, {stats.fps} fps
       </span>
       <br />
       <span>balls total: {balls.current.length}</span>
@@ -346,47 +378,46 @@ export default function Canvas() {
     </div>
   );
 }
-//? =========================================
-function updateBalls(balls: Ball[], gravityForce: number): void {
+
+// interface Ball {
+//   x: number;
+//   y: number;
+//   vx: number; IN RANGE FROM -1 TO 1
+//   vy: number; IN RANGE FROM -1 TO 1
+//   speed: number;
+//   radius: number;
+//   color: string;
+// }
+
+function handleCollisions(balls: Ball[]): void {
   const numBalls = balls.length;
 
   for (let i = 0; i < numBalls; i++) {
     const ballA = balls[i];
 
-    // Apply gravity to each ball based on its size
-    const gravity = gravityForce * ballA.radius;
-
-    // Update ball velocity with gravity
-    ballA.vy += gravity;
-
     for (let j = i + 1; j < numBalls; j++) {
       const ballB = balls[j];
 
-      // Calculate the distance between the centers of the two balls
       const dx = ballB.x - ballA.x;
       const dy = ballB.y - ballA.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      // Check if the distance is less than the sum of the radii
-      if (distance < ballA.radius + ballB.radius) {
-        // Calculate the collision angle and speed (same as before)
+      if (distance <= ballA.radius + ballB.radius) {
         const angle = Math.atan2(dy, dx);
         const sin = Math.sin(angle);
         const cos = Math.cos(angle);
 
-        // Rotate the coordinates (same as before)
-        // const x1 = 0;
-        // const y1 = 0;
-        // const x2 = dx * cos + dy * sin;
-        // const y2 = dy * cos - dx * sin;
+        const x1 = 0;
+        const y1 = 0;
+        const x2 = dx * cos + dy * sin;
+        const y2 = dy * cos - dx * sin;
 
-        // Rotate the velocities (same as before)
+        // Rotate the velocities
         const vx1 = ballA.vx * cos + ballA.vy * sin;
         const vy1 = ballA.vy * cos - ballA.vx * sin;
         const vx2 = ballB.vx * cos + ballB.vy * sin;
         const vy2 = ballB.vy * cos - ballB.vx * sin;
 
-        // Calculate the final velocities using one-dimensional collision equations (same as before)
         const finalVx1 =
           ((ballA.radius - ballB.radius) * vx1 + 2 * ballB.radius * vx2) /
           (ballA.radius + ballB.radius);
@@ -396,22 +427,80 @@ function updateBalls(balls: Ball[], gravityForce: number): void {
         const finalVy1 = vy1;
         const finalVy2 = vy2;
 
-        // Rotate the velocities back (same as before)
+        // Rotate the velocities back
         const finalVx1Rotated = finalVx1 * cos - finalVy1 * sin;
         const finalVy1Rotated = finalVy1 * cos + finalVx1 * sin;
         const finalVx2Rotated = finalVx2 * cos - finalVy2 * sin;
         const finalVy2Rotated = finalVy2 * cos + finalVx2 * sin;
 
-        // Update the velocities of the colliding balls (same as before)
+        // Calculate the minimum translation distance needed to separate the balls
+        const overlap = ballA.radius + ballB.radius - distance;
+        const overlapX = (dx / distance) * overlap;
+        const overlapY = (dy / distance) * overlap;
+
+        // Move the balls away from each other
+        ballA.x -= overlapX / 2;
+        ballA.y -= overlapY / 2;
+        ballB.x += overlapX / 2;
+        ballB.y += overlapY / 2;
+
+        // Update the velocities of the colliding balls
         ballA.vx = finalVx1Rotated;
         ballA.vy = finalVy1Rotated;
         ballB.vx = finalVx2Rotated;
         ballB.vy = finalVy2Rotated;
       }
     }
-
-    // Update ball position based on velocity
-    ballA.x += ballA.vx;
-    ballA.y += ballA.vy;
   }
 }
+//   // collision detection NO ROTATION
+//   for (let j = 0; j < balls.length; j++) {
+//     const ballB = balls[j];
+
+//     // Calculate the distance between the centers of the two balls
+//     const dx = ballB.x - ballA.x;
+//     const dy = ballB.y - ballA.y;
+//     const distance = Math.sqrt(dx * dx + dy * dy);
+
+//     // Check if the distance is less than the sum of the radii
+//     if (distance < ballA.radius + ballB.radius) {
+//       // Calculate the collision angle and speed
+//       const angle = Math.atan2(dy, dx);
+//       const sin = Math.sin(angle);
+//       const cos = Math.cos(angle);
+
+//       // Rotate the coordinates
+//       const x1 = 0;
+//       const y1 = 0;
+//       const x2 = dx * cos + dy * sin;
+//       const y2 = dy * cos - dx * sin;
+
+//       // Rotate the velocities
+//       const vx1 = ballA.vx * cos + ballA.vy * sin;
+//       const vy1 = ballA.vy * cos - ballA.vx * sin;
+//       const vx2 = ballB.vx * cos + ballB.vy * sin;
+//       const vy2 = ballB.vy * cos - ballB.vx * sin;
+
+//       // Calculate the final velocities using one-dimensional collision equations
+//       const finalVx1 =
+//         ((ballA.radius - ballB.radius) * vx1 + 2 * ballB.radius * vx2) /
+//         (ballA.radius + ballB.radius);
+//       const finalVx2 =
+//         ((ballB.radius - ballA.radius) * vx2 + 2 * ballA.radius * vx1) /
+//         (ballA.radius + ballB.radius);
+//       const finalVy1 = vy1;
+//       const finalVy2 = vy2;
+
+//       // Rotate the velocities back
+//       const finalVx1Rotated = finalVx1 * cos - finalVy1 * sin;
+//       const finalVy1Rotated = finalVy1 * cos + finalVx1 * sin;
+//       const finalVx2Rotated = finalVx2 * cos - finalVy2 * sin;
+//       const finalVy2Rotated = finalVy2 * cos + finalVx2 * sin;
+
+//       // Update the velocities of the colliding balls
+//       ballA.vx = finalVx1Rotated;
+//       ballA.vy = finalVy1Rotated;
+//       ballB.vx = finalVx2Rotated;
+//       ballB.vy = finalVy2Rotated;
+//     }
+//   }
