@@ -7,6 +7,7 @@ interface Ball {
   y: number;
   vx: number;
   vy: number;
+  // speed: number;
   radius: number;
   color: string;
 }
@@ -15,26 +16,17 @@ export default function Canvas() {
   const mainCanvasRef = useRef<HTMLCanvasElement>(null);
   // const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
   const [canvasSize, setCanvasSize] = useState<{ width: number; height: number } | null>(null);
-  // const [simulationTakesTime, setSimulationTakesTime] = useState<number | null>(null);
-  // const simulationTakesTime = useRef<number | null>(null);
-  // const [maxSpeed, setMaxSpeed] = useState<number>(0);
 
   const balls = useRef<Ball[]>([]);
-  // const animationFrame = useRef<number>();
-  // const calcInterval = useRef<NodeJS.Timer>();
   const simulationInterval = useRef<NodeJS.Timer>();
 
   const resize = useCallback(() => {
     const mainCanvas = mainCanvasRef.current;
-    // const overlayCanvas = overlayCanvasRef.current;
 
     if (!mainCanvas) return;
-    // if (!overlayCanvas) return;
     console.log('resize');
     const { width, height } = mainCanvas.getBoundingClientRect();
-    // dpr
     const dpr = window.devicePixelRatio || 1;
-    // set canvas size
     setCanvasSize({ width: width * dpr, height: height * dpr });
   }, []);
 
@@ -91,6 +83,7 @@ export default function Canvas() {
       y: height / 2,
       vx: 0,
       vy: 0,
+      // speed: 0,
       radius: 200,
       color: '#fff',
     });
@@ -146,58 +139,6 @@ export default function Canvas() {
         ballA.y = ballA.radius;
         ballA.vy *= -1;
       }
-
-      //   // collision detection NO ROTATION
-      //   for (let j = 0; j < balls.length; j++) {
-      //     const ballB = balls[j];
-
-      //     // Calculate the distance between the centers of the two balls
-      //     const dx = ballB.x - ballA.x;
-      //     const dy = ballB.y - ballA.y;
-      //     const distance = Math.sqrt(dx * dx + dy * dy);
-
-      //     // Check if the distance is less than the sum of the radii
-      //     if (distance < ballA.radius + ballB.radius) {
-      //       // Calculate the collision angle and speed
-      //       const angle = Math.atan2(dy, dx);
-      //       const sin = Math.sin(angle);
-      //       const cos = Math.cos(angle);
-
-      //       // Rotate the coordinates
-      //       const x1 = 0;
-      //       const y1 = 0;
-      //       const x2 = dx * cos + dy * sin;
-      //       const y2 = dy * cos - dx * sin;
-
-      //       // Rotate the velocities
-      //       const vx1 = ballA.vx * cos + ballA.vy * sin;
-      //       const vy1 = ballA.vy * cos - ballA.vx * sin;
-      //       const vx2 = ballB.vx * cos + ballB.vy * sin;
-      //       const vy2 = ballB.vy * cos - ballB.vx * sin;
-
-      //       // Calculate the final velocities using one-dimensional collision equations
-      //       const finalVx1 =
-      //         ((ballA.radius - ballB.radius) * vx1 + 2 * ballB.radius * vx2) /
-      //         (ballA.radius + ballB.radius);
-      //       const finalVx2 =
-      //         ((ballB.radius - ballA.radius) * vx2 + 2 * ballA.radius * vx1) /
-      //         (ballA.radius + ballB.radius);
-      //       const finalVy1 = vy1;
-      //       const finalVy2 = vy2;
-
-      //       // Rotate the velocities back
-      //       const finalVx1Rotated = finalVx1 * cos - finalVy1 * sin;
-      //       const finalVy1Rotated = finalVy1 * cos + finalVx1 * sin;
-      //       const finalVx2Rotated = finalVx2 * cos - finalVy2 * sin;
-      //       const finalVy2Rotated = finalVy2 * cos + finalVx2 * sin;
-
-      //       // Update the velocities of the colliding balls
-      //       ballA.vx = finalVx1Rotated;
-      //       ballA.vy = finalVy1Rotated;
-      //       ballB.vx = finalVx2Rotated;
-      //       ballB.vy = finalVy2Rotated;
-      //     }
-      //   }
     });
     updateBalls(balls, 0.02);
     return balls;
@@ -209,38 +150,6 @@ export default function Canvas() {
     }
     simulation(balls.current, canvasSize.width, canvasSize.height);
   }, [canvasSize]);
-
-  // async function measureSimulationTime(balls: Ball[], width: number, height: number) {
-  //   const start = Date.now();
-  //   simulation(balls, width, height);
-  //   const end = Date.now();
-  //   return end - start;
-  // }
-
-  // async callback to measure the time it takes to run the simulation
-  // const measureSimulationTime = useCallback(
-  //   async (balls: Ball[], width: number, height: number) => {
-  //     const start = performance.now();
-  //     await setTimeout(() => {}, 2000);
-  //     simulation(balls, width, height);
-  //     const end = performance.now();
-  //     setSimulationTakesTime(end - start);
-  //   },
-  //   [],
-  // );
-
-  // set the time it takes to run the simulation
-  // useEffect(() => {
-  //   if (!canvasSize) return;
-  //   const { width, height } = canvasSize;
-  //   const balls2 = balls.current;
-  //   if (!balls2) return;
-  //   measureSimulationTime(balls2, width, height);
-  // }, [canvasSize, measureSimulationTime]);
-
-  // useEffect(() => {
-  //   console.log('simulationTakesTime', simulationTakesTime);
-  // }, [simulationTakesTime]);
 
   function drawBalls(balls: Ball[], context: CanvasRenderingContext2D) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
@@ -282,42 +191,9 @@ export default function Canvas() {
     drawBalls(balls.current, context);
   }, []);
 
-  // // run the animation frame loop to draw the balls
-  // useEffect(() => {
-  //   // if (!canvasSize) return;
-  //   // const { width, height } = canvasSize;
-  //   const mainCanvas = mainCanvasRef.current;
-
-  //   if (!mainCanvas) return;
-
-  //   const context = mainCanvas.getContext('2d');
-  //   if (!context) return;
-
-  //   // animation frame loop
-  //   //  only draw the balls
-  //   const drawTick = () => {
-  //     // console.log('drawTick');
-  //     // draw the balls
-  //     drawBalls(balls.current, context);
-  //     // request next frame
-  //     animationFrame.current = requestAnimationFrame(drawTick);
-  //   };
-  //   console.log('start animation frame loop');
-  //   // start the animation frame loop
-  //   animationFrame.current = requestAnimationFrame(drawTick);
-
-  //   // clean up the animation frame loop
-  //   return () => {
-  //     console.log('clean up animation frame loop');
-  //     cancelAnimationFrame(animationFrame.current as number);
-  //   };
-  // }, []);
-
-  // const [simulationFrameRate, setSimulationFrameRate] = useState<number>(0);
+  /** seconds per iteration */
   const initialSimulationFrameRate = 1000 / 30;
-  const [simulationSpeed, setSimulationSpeed] = useState(initialSimulationFrameRate); // iterations per second
-  // const [freshSimulationSpeed] = useState(simulationSpeed);
-  // run the simulation
+  const [simulationSpeed, setSimulationSpeed] = useState(initialSimulationFrameRate);
 
   const engine = useMemo(
     () => new EngineWithStats(simulate, render, initialSimulationFrameRate),
@@ -398,123 +274,10 @@ export default function Canvas() {
     }
 
     if (event.code === 'KeyK') {
-      // console.log(engine.animation_frame_request);
       engine.isRunning ? engine.stop() : engine.start();
       return;
     }
   });
-
-  // useEffect(() => {
-  //   if (!canvasSize) return;
-  //   const { width, height } = canvasSize;
-  //   if (!balls.current.length) return;
-
-  //   // calculate time that it takes to run the simulation
-  //   function calculateTimeToRunSimulation() {
-  //     const start = performance.now();
-  //     // run 10 simulations
-  //     for (let i = 0; i < 10; i++) {
-  //       simulation(balls.current, width, height);
-  //     }
-  //     const end = performance.now();
-  //     const timeToRunSimulation = (end - start) / 10;
-  //     simulationTakesTime.current = timeToRunSimulation;
-  //   }
-  //   calculateTimeToRunSimulation();
-  //   // every 10 seconds calculate the time it takes to run the simulation
-  //   calcInterval.current = setInterval(() => {
-  //     calculateTimeToRunSimulation();
-  //   }, 10000);
-
-  //   return () => {
-  //     clearInterval(calcInterval.current);
-  //   };
-  // }, [canvasSize]);
-
-  // useEffect(() => {
-  //   if (!canvasSize) return;
-  //   const { width, height } = canvasSize;
-  //   if (!balls.current.length) return;
-
-  //   // calculate time that it takes to run the simulation
-  //   // const timeToRunSimulation = measureSimulationTime(() => {
-  //   //   simulation(balls.current, width, height);
-  //   // });
-  //   // setSimulationTakesTime(timeToRunSimulation);
-  //   // console.log('timeToRunSimulation', timeToRunSimulation);
-
-  //   // const start = performance.now();
-  //   // simulation(balls.current, width, height);
-  //   // const end = performance.now();
-  //   // setSimulationTakesTime(end - start);
-  //   // console.log('timeToRunSimulation', end - start);
-
-  //   const timeOutTime = 1000 / simulationSpeed;
-
-  //   let iterations = 0;
-  //   // calculate how many iterations will be run in a second
-  //   // const simsPerSec =  1000 / (1000 / simulationSpeed);
-  //   let startTimestamp = performance.now();
-  //   const simulationTick = () => {
-  //     console.log('simulationTick');
-
-  //     simulation(balls.current, width, height);
-
-  //     iterations++;
-
-  //     // if (iterations < simulationSpeed / 2) return;
-  //     const timeStamp = performance.now();
-
-  //     if (timeStamp - startTimestamp >= 1000) {
-  //       setSimulationFrameRate(iterations);
-  //       iterations = 0;
-  //       startTimestamp = performance.now();
-  //     }
-  //   };
-  //   console.log('start simulation loop');
-  //   // start the simulation loop
-
-  //   simulationInterval.current = setInterval(simulationTick, timeOutTime);
-  //   // simulationTick();
-  //   // clean up the simulation loop
-  //   return () => {
-  //     console.log('clean up simulation loop');
-  //     clearInterval(simulationInterval.current);
-  //   };
-  // }, [canvasSize]);
-
-  // useEffect(() => {
-  //   const startTimestamp = performance.now();
-  //   let iterations = 0;
-
-  //   const measureIterationTime = () => {
-  //     iterations++;
-
-  //     if (iterations >= 60) {
-  //       const elapsed = performance.now() - startTimestamp;
-  //       const iterationTime = elapsed / iterations;
-
-  //       // Calculate the maximum speed based on the iteration time
-  //       const newMaxSpeed = Math.floor(1000 / iterationTime);
-
-  //       // Set the new maximum speed
-  //       setMaxSpeed(newMaxSpeed);
-
-  //       iterations = 0;
-  //     }
-
-  //     // Request the next iteration
-  //     setTimeout(measureIterationTime);
-  //   };
-
-  //   // Start measuring the iteration time
-  //   setTimeout(measureIterationTime);
-
-  //   // Clean up the measurement on component unmount
-  //   return () => {
-  //     // iterations = 0;
-  //   };
-  // }, []);
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
