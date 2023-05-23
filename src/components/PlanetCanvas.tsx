@@ -1,5 +1,6 @@
-import { PlanetController } from '@/classes/PlanetController';
+// import { PlanetController } from '@/classes/PlanetController';
 import { EngineWithStats } from '@/classes/engine';
+import { BodyController } from '@/functional/BodyController';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useEffectOnce, useEventListener } from 'usehooks-ts';
 
@@ -39,8 +40,8 @@ export default function PlanetCanvas() {
   }, [canvasSize]);
 
   const planetController = useMemo(
-    () => new PlanetController(5, canvasSize?.width ?? 0, canvasSize?.height ?? 0),
-    [canvasSize?.height, canvasSize?.width],
+    () => new BodyController(5), //  canvasSize?.width ?? 0, canvasSize?.height ?? 0
+    [],
   );
 
   const render = useCallback(() => {
@@ -143,14 +144,14 @@ export default function PlanetCanvas() {
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <span>
-        <input
+        {/* <input
           type="number"
           onBlur={(event) => {
             setSimulationSpeed(1000 / Number(event.target.value));
           }}
           defaultValue={stats.ups}
-        />
-        ups, {stats.fps} fps
+        /> */}
+        {stats.ups} ups, {stats.fps} fps
       </span>
       <br />
       <span>Planets total: {planetController.planets.length}</span>
