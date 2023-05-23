@@ -1,6 +1,6 @@
 'use client';
-import Canvas from './Canvas';
+import PlanetCanvas from './PlanetCanvas';
 
 export default function Playground() {
-  return <Canvas />;
+  return <PlanetCanvas />;
 }
