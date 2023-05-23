@@ -9,8 +9,8 @@ function noStroke(ctx: CanvasRenderingContext2D) {
 }
 
 export class Body {
-  d = this.mass * 2;
-  thetaInit = 0;
+  diameter = this.mass * 2;
+  // thetaInit = 0;
   path: P5.Vector[] = [];
   /** Was 200 in the original */
   pathLen = 500;
@@ -34,7 +34,7 @@ export class Body {
     ctx.fillStyle = makeMonotoneRgb(255);
     noStroke(ctx);
     ctx.beginPath();
-    ctx.ellipse(this.pos.x, this.pos.y, this.d / 2, this.d / 2, 0, 0, 2 * Math.PI);
+    ctx.ellipse(this.pos.x, this.pos.y, this.diameter / 2, this.diameter / 2, 0, 0, 2 * Math.PI);
     ctx.fill();
   }
 
@@ -59,15 +59,16 @@ export class Body {
     if (this.path.length > this.pathLen) this.path.splice(0, 1);
   }
 
-  applyForce(f: P5.Vector) {
-    this.vel.x += f.x / this.mass;
-    this.vel.y += f.y / this.mass;
+  applyForce(force: P5.Vector) {
+    this.vel.x += force.x / this.mass;
+    this.vel.y += force.y / this.mass;
   }
 
   attract(child: this) {
+    /** `r` is a common name for distance */
     const r = p5.dist(this.pos.x, this.pos.y, child.pos.x, child.pos.y);
-    const f = this.pos.copy().sub(child.pos);
-    f.setMag((G * this.mass * child.mass) / (r * r));
-    child.applyForce(f);
+    const force = this.pos.copy().sub(child.pos);
+    force.setMag((G * this.mass * child.mass) / r ** 2);
+    child.applyForce(force);
   }
 }

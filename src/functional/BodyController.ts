@@ -18,16 +18,19 @@ export class BodyController {
     // Initialize the planets
     for (let i = 0; i < this.numPlanets; i++) {
       let mass = p5.random(5, 15);
-      let radius = p5.random(this.sun.d, p5.min(p5.windowWidth / 2, p5.windowHeight / 2));
+      let spawnRadius = p5.random(
+        this.sun.diameter,
+        p5.min(p5.windowWidth / 2, p5.windowHeight / 2),
+      );
       let angle = p5.random(0, p5.TWO_PI);
-      let planetPos = p5.createVector(radius * p5.cos(angle), radius * p5.sin(angle));
+      let planetPos = p5.createVector(spawnRadius * p5.cos(angle), spawnRadius * p5.sin(angle));
 
       // Find direction of orbit and set velocity
       let planetVel = planetPos.copy();
       if (p5.random(1) < 0.1) planetVel.rotate(-p5.HALF_PI);
       else planetVel.rotate(p5.HALF_PI); // Direction of orbit
       planetVel.normalize();
-      planetVel.mult(p5.sqrt((G * this.sun.mass) / radius)); // Circular orbit velocity
+      planetVel.mult(p5.sqrt((G * this.sun.mass) / spawnRadius)); // Circular orbit velocity
       planetVel.mult(p5.random(1 - this.destabilize, 1 + this.destabilize)); // create elliptical orbit
 
       this.planets.push(new Body(mass, planetPos, planetVel));
